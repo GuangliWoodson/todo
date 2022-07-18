@@ -2,8 +2,8 @@
   <section class="todoapp">
     <!-- 除了驼峰, 还可以使用-转换链接 -->
     <TodoHeader @create="createFn"></TodoHeader>
-    <TodoMain :list="list"></TodoMain>
-    <TodoFooter></TodoFooter>
+    <TodoMain :list="list" @del="delFn"></TodoMain>
+    <TodoFooter :count="count"></TodoFooter>
   </section>
 </template>
 
@@ -36,6 +36,16 @@ export default {
         name: val,
         isDone: false
       })
+    },
+    delFn(id) {
+      let index = this.list.findIndex(obj => obj.id === id)
+      this.list.splice(index, 1)
+    }
+  },
+  computed: {
+    count() {
+      // !ele.isDone = ele.isDone == false
+      return this.list.filter((ele) => !ele.isDone).length
     }
   }
 };
