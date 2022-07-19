@@ -2,8 +2,8 @@
   <section class="todoapp">
     <!-- 除了驼峰, 还可以使用-转换链接 -->
     <TodoHeader @create="createFn"></TodoHeader>
-    <TodoMain :list="list" @del="delFn"></TodoMain>
-    <TodoFooter :count="count"></TodoFooter>
+    <TodoMain :list="showList" @del="delFn"></TodoMain>
+    <TodoFooter :count="count" @changeType="changeFn" @cls="cleanFn"></TodoFooter>
   </section>
 </template>
 
@@ -22,11 +22,8 @@ export default {
   },
   data() {
     return {
-      list: [
-        { id: 100, name: "吃饭", isDone: true },
-        { id: 101, name: "睡觉", isDone: false },
-        { id: 102, name: "打豆豆", isDone: true },
-      ],
+      list: (localStorage.getItem("todolist") && JSON.parse(localStorage.getItem("todolist"))) || [],
+      getSel: 'all'
     };
   },
   methods: {
@@ -40,12 +37,35 @@ export default {
     delFn(id) {
       let index = this.list.findIndex(obj => obj.id === id)
       this.list.splice(index, 1)
+    },
+    changeFn(val) {
+      this.getSel = val
+    },
+    cleanFn() {
+      this.list = this.list.filter((ele) => !ele.isDone)
     }
   },
   computed: {
     count() {
       // !ele.isDone = ele.isDone == false
       return this.list.filter((ele) => !ele.isDone).length
+    },
+    showList() {
+      if (this.getSel === 'yes') {
+        return this.list.filter((ele) => ele.isDone)
+      } else if (this.getSel === 'no') {
+        return this.list.filter((ele) => !ele.isDone)
+      } else {
+        return this.list
+      }
+    }
+  },
+  watch: {
+    list: {
+      deep: true,
+      handler (val) {
+        localStorage.setItem("todolist", JSON.stringify(val || []))
+      }
     }
   }
 };
